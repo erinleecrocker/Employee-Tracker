@@ -18,9 +18,10 @@ let rolesArray = ["Lead Engineer", "Software Engineer", "Sales Lead", "Salespers
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    getDepartmentNames();
-    getRoleTitles();
-    initialQuestion();
+    getEmployees();
+    // getDepartmentNames();
+    // getRoleTitles();
+    // initialQuestion();
 });
 
 function initialQuestion() {
@@ -35,9 +36,9 @@ function initialQuestion() {
             "View Employees by Departments",
             "Add a new Employee",
             "Add a new Role",
-            // "Add a Department Role",
+            "Add a new Department",
             // "Update Employee's Role",
-            // "Exit",
+            "Exit",
           ],
         },
       ])
@@ -51,14 +52,17 @@ function initialQuestion() {
             addEmployee();
         } else if (data.InitialQuestion === "Add a new Role") {
             addRoles();
+        } else if (data.InitialQuestion === "Add a new Department") {
+            addDepartments();
         } 
-        // else if (data.InitialQuestion === "Add a new Department") {
+        //else if ( data.InitialQuestion === "Update Employee's Role") {
           
-        // } else if ( data.InitialQuestion === "Update Employee's Role") {
-          
-        // } else if (data.InitialQuestion === "Exit") {
-        //   console.log("You have exited the Employee Tracker.");
-        // }
+       // }
+         else if (data.InitialQuestion === "Exit") {
+            console.log("-------------------------------------");
+            console.log("You have existed the Employee Tracker.");
+            console.log("-------------------------------------");
+        };
     });
 };
 
@@ -105,6 +109,13 @@ function getRoleTitles() {
         rolesArray = res.map(({ title }) => title);
     });
 };
+// RETRIEVE EMPLOYEE NAMES AND ID's
+function getEmployees() {
+    connection.query("SELECT first_name, last_name FROM employee ORDER BY id;", (err, res) =>{
+        if(err) throw err;
+        console.log(res);
+    })
+}
 
 // VIEW ROLES
 function showRoles() {
@@ -193,11 +204,9 @@ function addDepartments(){
         }
 
     ]).then((answer) => {
-        console.log(`Adding ${department.name} the list of departments ...\n`);
-        var departmentID = departmentsArray.indexOf(answer.department) +1;
-        console.log(departmentID);
+        console.log(`Adding ${answer.name} to the list of departments ...\n`);
         var query = "INSERT INTO departments (department_name) VALUE ( ? ) ";
-        connection.query(query,[answer.title, answer.salary, departmentID],(err, res) => {
+        connection.query(query,[answer.name],(err, res) => {
         if (err) throw err;
         console.log("Successfully added a new department!");
         getDepartmentNames();
@@ -206,15 +215,36 @@ function addDepartments(){
     });
 };
 
-function addDepartmentInfo() {
-    console.log("Adding new department...\n");
-    connection.query("INSERT INTO departments (department_name) VALUE('testdepartmentName')",(err, res) => {
-        if (err) throw err;
-        console.log("Successfully added new department!");
-        initialQuestion()
-    });
-}
 // UPDATE EMPLOYEE ROLES
+function updeateEmployeeRoles(){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "name",
+            message: "Which Employee would you like to change roles?",
+            choices: employeeNamesArray
+        },
+        {
+            type: "list",
+            name: "whichRole",
+            message: "What is this employee's new role?",
+            choices: rolesArray
+        }
+
+    ]).then((answer) => {
+        console.log(`Changing ${answer.name}'s role to ${answer.whichRole} ...\n`);
+        // var employeeArray = departmentsArray.indexOf(answer.department) +1;
+        console.log(answer.body);
+        // var query = "REPLACE (employee.role) FROM employee WHERE ( ? ) ";
+        // connection.query(query,[answer.title, answer.salary, departmentID],(err, res) => {
+        // if (err) throw err;
+        // console.log("Successfully added a new department!");
+        // getDepartmentNames();
+        // initialQuestion();
+        // });
+        
+    });
+};
 function updateEmployeeRoles(){
     console.log("Updating employee role...\n");
     connection.query("",(err,res)=>{

@@ -11,12 +11,13 @@ VALUE ("Lead Engineer", 150000), ("Software Engineer", 120000), ("Sales Lead",10
 INSERT INTO departments (department_name)
 VALUE ("Sales"), ("Engineering"), ("Finance"), ("Legal");
 
-SELECT Orders.OrderID, Customers.CustomerName, Shippers.ShipperName
-FROM ((Orders
-INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID)
-INNER JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID);
 
-SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, roles.department_id, roles.salary, employee.manager_id
-FROM employees
-INNER JOIN roles ON roles.title = employee.role_id
-INNER JOIN departments ON departments.department_name = roles.department_id;
+
+
+
+-- trial and error
+SELECT employee.id, employee.first_name, employee.last_name, roles.title, departments.department_name, roles.salary, employee.manager_id
+FROM ((roles
+LEFT JOIN employee ON employee.role_id = roles.id)
+RIGHT JOIN departments ON departments.id = roles.department_id)
+ORDER BY employee.id;
