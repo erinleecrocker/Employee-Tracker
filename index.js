@@ -12,16 +12,16 @@ const connection = mysql.createConnection({
 
 let employeeNamesArray = [];
 let departmentsArray = [];
-let rolesArray = ["Lead Engineer", "Software Engineer", "Sales Lead", "Salesperson","Accountant", "Lead Engineer", "Legal Team Lead", "Lawyer"];
+let rolesArray = [];
 
   
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     getEmployees();
-    // getDepartmentNames();
-    // getRoleTitles();
-    // initialQuestion();
+    getDepartmentNames();
+    getRoleTitles();
+    initialQuestion();
 });
 
 function initialQuestion() {
@@ -37,7 +37,7 @@ function initialQuestion() {
             "Add a new Employee",
             "Add a new Role",
             "Add a new Department",
-            // "Update Employee's Role",
+            "Update Employee's Role",
             "Exit",
           ],
         },
@@ -54,14 +54,14 @@ function initialQuestion() {
             addRoles();
         } else if (data.InitialQuestion === "Add a new Department") {
             addDepartments();
-        } 
-        //else if ( data.InitialQuestion === "Update Employee's Role") {
-          
-       // }
-         else if (data.InitialQuestion === "Exit") {
+        } else if ( data.InitialQuestion === "Update Employee's Role") {
+            // console.log("updated Employees");
+            updeateEmployeeRoles();
+        } else if (data.InitialQuestion === "Exit") {
             console.log("-------------------------------------");
             console.log("You have existed the Employee Tracker.");
             console.log("-------------------------------------");
+            connection.end();
         };
     });
 };
@@ -91,6 +91,7 @@ function showByDepartments() {
         connection.query(query,[answer.chooseDepartment], function (err, res) {
         if (err) throw err;
         console.table(res);
+        initialQuestion();
         });
     });
 };
@@ -111,10 +112,14 @@ function getRoleTitles() {
 };
 // RETRIEVE EMPLOYEE NAMES AND ID's
 function getEmployees() {
-    connection.query("SELECT first_name, last_name FROM employee ORDER BY id;", (err, res) =>{
+    connection.query("SELECT first_name, last_name FROM employee", (err, res) =>{
         if(err) throw err;
-        console.log(res);
-    })
+          var employeenames = [];
+        for (i=0; i<res.length; i++) {
+            employeenames.push(`${res[i].first_name} ${res[i].last_name}`);
+        }
+        employeeNamesArray = employeenames;
+    });
 }
 
 // VIEW ROLES
@@ -157,6 +162,7 @@ function addEmployee()  {
         console.log("Successfully added new employee!");
         getRoleTitles();
         initialQuestion();
+        getEmployees();
         })
     })
 }
@@ -234,13 +240,14 @@ function updeateEmployeeRoles(){
     ]).then((answer) => {
         console.log(`Changing ${answer.name}'s role to ${answer.whichRole} ...\n`);
         // var employeeArray = departmentsArray.indexOf(answer.department) +1;
-        console.log(answer.body);
-        // var query = "REPLACE (employee.role) FROM employee WHERE ( ? ) ";
+        // console.log(answer);
+        // var query = "REPLACE (employee.role,) FROM employee WHERE ( ? )";
         // connection.query(query,[answer.title, answer.salary, departmentID],(err, res) => {
         // if (err) throw err;
-        // console.log("Successfully added a new department!");
+        // console.log("Successfully changed Employee Role!");
+        // getEmployees();
         // getDepartmentNames();
-        // initialQuestion();
+        initialQuestion();
         // });
         
     });
